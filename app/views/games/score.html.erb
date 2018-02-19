@@ -1,0 +1,31 @@
+<h1>Results</h1>
+
+<%=
+require "open-uri"
+require 'json'
+
+def included?(guess, grid)
+  guess.chars.all? { |letter| guess.count(letter) <= grid.count(letter) }
+end
+
+def english_word?(z)
+  response = open("https://wagon-dictionary.herokuapp.com/#{z}")
+  json = JSON.parse(response.read)
+  return json['found']
+end
+
+@word = params[:word]
+@letters = params[:letters].split('')
+
+if included?(@word.upcase, @letters) && english_word?(@word)
+  "Congratulations! #{@word.upcase} is a valid english word!"
+elsif included?(@word.upcase, @letters) && (english_word?(@word) == false)
+  "Sorry, but #{@word.upcase} is not a valid word in english!"
+else
+  "Sorry, but #{@word.upcase} can't be built out of #{@letters}"
+end
+
+%>
+
+
+<%= link_to "Play again!", "new"  %>
